@@ -1,5 +1,4 @@
 ﻿using LostAndFound.Domain.Entities;
-using LostAndFound.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -27,7 +26,7 @@ public class NotificationConfiguration
         builder.Property(x => x.CreatedAt)
             .IsRequired();
 
-        builder.HasOne<ApplicationUser>()
+        builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Restrict);

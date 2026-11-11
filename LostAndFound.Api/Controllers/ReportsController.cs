@@ -19,6 +19,7 @@ public class ReportsController : ControllerBase
         _reportService = reportService;
     }
 
+    [HttpGet]
     public async Task<ActionResult<PaginatedResponse<ReportResponse>>> Search(
         [FromQuery] SearchReportsRequest request)
     {

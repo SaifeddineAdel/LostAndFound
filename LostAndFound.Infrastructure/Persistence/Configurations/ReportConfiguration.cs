@@ -1,5 +1,4 @@
 ﻿using LostAndFound.Domain.Entities;
-using LostAndFound.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -49,17 +48,17 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
             .HasForeignKey(x => x.LocationId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<ApplicationUser>()
+        builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<ApplicationUser>()
+        builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(x => x.ApprovedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<ApplicationUser>()
+        builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(x => x.ResolvedByUserId)
             .OnDelete(DeleteBehavior.Restrict);

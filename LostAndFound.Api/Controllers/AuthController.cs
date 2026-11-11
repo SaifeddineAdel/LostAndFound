@@ -1,8 +1,6 @@
 ﻿using FluentValidation;
-using LostAndFound.Application.Features.Auth.Login.DTOs;
-using LostAndFound.Application.Features.Auth.Login.Interfaces;
-using LostAndFound.Application.Features.Auth.Register.DTOs;
-using LostAndFound.Application.Features.Auth.Register.Interfaces;
+using LostAndFound.Application.Features.Auth.DTOs;
+using LostAndFound.Application.Features.Auth.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LostAndFound.Api.Controllers;
@@ -11,18 +9,18 @@ namespace LostAndFound.Api.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IRegisterService _registerService;
-    private readonly ILoginService _loginService;
+    private readonly IAuthService _authService;
     private readonly IValidator<RegisterRequest> _registerValidator;
+    private readonly IValidator<LoginRequest> _loginValidator;
 
     public AuthController(
-        IRegisterService registerService,
-        ILoginService loginService,
-        IValidator<RegisterRequest> registerValidator)
+        IAuthService authService,
+        IValidator<RegisterRequest> registerValidator,
+        IValidator<LoginRequest> loginValidator)
     {
-        _registerService = registerService;
-        _loginService = loginService;
+        _authService = authService;
         _registerValidator = registerValidator;
+        _loginValidator = loginValidator;
     }
 
     [HttpPost("register")]
@@ -33,12 +31,10 @@ public class AuthController : ControllerBase
             await _registerValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
-        {
             return BadRequest(validationResult.Errors);
-        }
 
         var response =
-            await _registerService.RegisterAsync(request);
+            await _authService.RegisterAsync(request);
 
         return Ok(response);
     }
@@ -47,9 +43,34 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login(
         LoginRequest request)
     {
+        var validationResult =
+            await _loginValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
+
         var response =
-            await _loginService.LoginAsync(request);
+            await _authService.LoginAsync(request);
 
         return Ok(response);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(
+        RefreshTokenRequest request)
+    {
+        var response =
+            await _authService.RefreshAsync(request);
+
+        return Ok(response);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(
+        RefreshTokenRequest request)
+    {
+        await _authService.LogoutAsync(request.RefreshToken);
+
+        return NoContent();
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
+using LostAndFound.Application.Features.Auth.Interfaces;
 using LostAndFound.Application.Features.Notifications.Interfaces;
 using LostAndFound.Application.Messaging.Events;
 using LostAndFound.Domain.Entities;
-using LostAndFound.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
+using LostAndFound.Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,8 +15,6 @@ namespace LostAndFound.Infrastructure.Messaging;
 
 public sealed class NotificationConsumer : BackgroundService
 {
-    private const string AdminRole = "Admin";
-
     private readonly RabbitMqOptions _options;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<NotificationConsumer> _logger;
@@ -152,7 +150,6 @@ public sealed class NotificationConsumer : BackgroundService
         catch (OperationCanceledException)
             when (stoppingToken.IsCancellationRequested)
         {
-            // The application is shutting down.
         }
     }
 
@@ -175,11 +172,11 @@ public sealed class NotificationConsumer : BackgroundService
                         ?? throw new InvalidOperationException(
                             "Invalid ReportCreatedEvent message.");
 
-                    var userManager = scope.ServiceProvider
-                        .GetRequiredService<UserManager<ApplicationUser>>();
+                    var userRepository = scope.ServiceProvider
+                        .GetRequiredService<IUserRepository>();
 
-                    var admins =
-                        await userManager.GetUsersInRoleAsync(AdminRole);
+                    var admins = await userRepository.GetByRoleAsync(
+                        UserRole.Admin);
 
                     foreach (var admin in admins)
                     {
@@ -201,8 +198,7 @@ public sealed class NotificationConsumer : BackgroundService
                     if (admins.Count == 0)
                     {
                         _logger.LogWarning(
-                            "No users found in the {AdminRole} role.",
-                            AdminRole);
+                            "No active users found in the Admin role.");
                     }
 
                     await repository.SaveChangesAsync(cancellationToken);
