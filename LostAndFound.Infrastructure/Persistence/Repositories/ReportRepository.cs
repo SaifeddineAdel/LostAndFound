@@ -1,5 +1,4 @@
-﻿
-using LostAndFound.Application.Common.Models;
+﻿using LostAndFound.Application.Common.Models;
 using LostAndFound.Application.Features.Reports.DTOs;
 using LostAndFound.Application.Features.Reports.Interfaces;
 using LostAndFound.Domain.Entities;
@@ -22,15 +21,15 @@ public class ReportRepository : IReportRepository
     {
         return await _context.Reports
             .AsNoTracking()
-            .Include(r => r.Images)
-            .FirstOrDefaultAsync(r => r.Id == id);
+            .Include(x => x.Images)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Report?> GetByIdAdminAsync(int id)
     {
         return await _context.Reports
-            .Include(r => r.Images)
-            .FirstOrDefaultAsync(r => r.Id == id);
+            .Include(x => x.Images)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<PaginatedResponse<Report>> GetAllApprovedAsync(
@@ -38,9 +37,9 @@ public class ReportRepository : IReportRepository
     {
         var query = _context.Reports
             .AsNoTracking()
-            .Where(r => r.Status == ReportStatus.Approved)
-            .OrderByDescending(r => r.CreatedAt)
-            .ThenByDescending(r => r.Id);
+            .Where(x => x.Status == ReportStatus.Approved)
+            .OrderByDescending(x => x.CreatedAt)
+            .ThenByDescending(x => x.Id);
 
         return await PaginateAsync(query, request);
     }
@@ -50,39 +49,39 @@ public class ReportRepository : IReportRepository
     {
         var query = _context.Reports
             .AsNoTracking()
-            .Where(r => r.Status == ReportStatus.Approved);
+            .Where(x => x.Status == ReportStatus.Approved);
 
         if (!string.IsNullOrWhiteSpace(request.Keyword))
         {
             var keyword = request.Keyword.Trim();
 
-            query = query.Where(r =>
-                r.Title.Contains(keyword) ||
-                r.Description.Contains(keyword));
+            query = query.Where(x =>
+                x.Title.Contains(keyword) ||
+                x.Description.Contains(keyword));
         }
 
         if (request.Type.HasValue)
         {
-            query = query.Where(r =>
-                r.Type == request.Type.Value);
+            query = query.Where(x =>
+                x.Type == request.Type.Value);
         }
 
         if (request.CategoryId.HasValue)
         {
-            query = query.Where(r =>
-                r.CategoryId == request.CategoryId.Value);
+            query = query.Where(x =>
+                x.CategoryId == request.CategoryId.Value);
         }
 
         if (request.SubCategoryId.HasValue)
         {
-            query = query.Where(r =>
-                r.SubCategoryId == request.SubCategoryId.Value);
+            query = query.Where(x =>
+                x.SubCategoryId == request.SubCategoryId.Value);
         }
 
         if (request.LocationId.HasValue)
         {
-            query = query.Where(r =>
-                r.LocationId == request.LocationId.Value);
+            query = query.Where(x =>
+                x.LocationId == request.LocationId.Value);
         }
 
         var sortOrder = request.SortOrder?.Trim();
@@ -91,10 +90,10 @@ public class ReportRepository : IReportRepository
             sortOrder,
             "oldest",
             StringComparison.OrdinalIgnoreCase)
-                ? query.OrderBy(r => r.CreatedAt)
-                    .ThenBy(r => r.Id)
-                : query.OrderByDescending(r => r.CreatedAt)
-                    .ThenByDescending(r => r.Id);
+                ? query.OrderBy(x => x.CreatedAt)
+                    .ThenBy(x => x.Id)
+                : query.OrderByDescending(x => x.CreatedAt)
+                    .ThenByDescending(x => x.Id);
 
         return await PaginateAsync(query, request);
     }
@@ -106,9 +105,9 @@ public class ReportRepository : IReportRepository
         var query = _context.Reports
             .IgnoreQueryFilters()
             .AsNoTracking()
-            .Where(r => r.UserId == userId)
-            .OrderByDescending(r => r.CreatedAt)
-            .ThenByDescending(r => r.Id);
+            .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.CreatedAt)
+            .ThenByDescending(x => x.Id);
 
         return await PaginateAsync(query, request);
     }
@@ -118,11 +117,21 @@ public class ReportRepository : IReportRepository
     {
         var query = _context.Reports
             .AsNoTracking()
-            .Where(r => r.Status == ReportStatus.Pending)
-            .OrderByDescending(r => r.CreatedAt)
-            .ThenByDescending(r => r.Id);
+            .Where(x => x.Status == ReportStatus.Pending)
+            .OrderByDescending(x => x.CreatedAt)
+            .ThenByDescending(x => x.Id);
 
         return await PaginateAsync(query, request);
+    }
+
+    public async Task AddAsync(Report report)
+    {
+        await _context.Reports.AddAsync(report);
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
     }
 
     private async Task<PaginatedResponse<Report>> PaginateAsync(
@@ -137,7 +146,7 @@ public class ReportRepository : IReportRepository
         var items = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .Include(r => r.Images)
+            .Include(x => x.Images)
             .ToListAsync();
 
         return new PaginatedResponse<Report>
@@ -147,20 +156,5 @@ public class ReportRepository : IReportRepository
             PageSize = pageSize,
             TotalCount = totalCount
         };
-    }
-
-    public async Task AddAsync(Report report)
-    {
-        await _context.Reports.AddAsync(report);
-    }
-
-    public void Update(Report report)
-    {
-        _context.Reports.Update(report);
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await _context.SaveChangesAsync();
     }
 }

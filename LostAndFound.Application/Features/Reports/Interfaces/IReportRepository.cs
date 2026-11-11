@@ -1,5 +1,4 @@
-﻿
-using LostAndFound.Application.Common.Models;
+﻿using LostAndFound.Application.Common.Models;
 using LostAndFound.Application.Features.Reports.DTOs;
 using LostAndFound.Domain.Entities;
 
@@ -25,8 +24,6 @@ public interface IReportRepository
         PaginationRequest request);
 
     Task AddAsync(Report report);
-
-    void Update(Report report);
 
     Task SaveChangesAsync();
 }

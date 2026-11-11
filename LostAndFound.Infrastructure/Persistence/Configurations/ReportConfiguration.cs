@@ -63,5 +63,9 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
             .WithMany()
             .HasForeignKey(x => x.ResolvedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(x => x.Images)
+            .HasField("_images")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

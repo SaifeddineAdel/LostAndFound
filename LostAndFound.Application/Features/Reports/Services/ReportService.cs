@@ -1,5 +1,4 @@
-﻿
-using LostAndFound.Application.Common.Exceptions;
+﻿using LostAndFound.Application.Common.Exceptions;
 using LostAndFound.Application.Common.Interfaces;
 using LostAndFound.Application.Common.Models;
 using LostAndFound.Application.Features.Categories.Interfaces;
@@ -84,10 +83,7 @@ public class ReportService : IReportService
 
                 savedImageUrls.Add(imageUrl);
 
-                report.Images.Add(new ReportImage
-                {
-                    ImageUrl = imageUrl
-                });
+                report.AddImage(ReportImage.Create(imageUrl));
             }
 
             await _reportRepository.AddAsync(report);
@@ -103,7 +99,6 @@ public class ReportService : IReportService
                 }
                 catch
                 {
-                    // Cleanup failures should be logged in production.
                 }
             }
 
@@ -210,11 +205,7 @@ public class ReportService : IReportService
 
         EnsurePending(report);
 
-        ReportMapper.Approve(
-            report,
-            _currentUserService.UserId);
-
-        _reportRepository.Update(report);
+        report.Approve(_currentUserService.UserId);
 
         await _reportRepository.SaveChangesAsync();
 
@@ -232,9 +223,7 @@ public class ReportService : IReportService
 
         EnsurePending(report);
 
-        ReportMapper.Reject(report);
-
-        _reportRepository.Update(report);
+        report.Reject();
 
         await _reportRepository.SaveChangesAsync();
 
@@ -253,11 +242,7 @@ public class ReportService : IReportService
 
         EnsureApproved(report);
 
-        ReportMapper.Resolve(
-            report,
-            _currentUserService.UserId);
-
-        _reportRepository.Update(report);
+        report.Resolve(_currentUserService.UserId);
 
         await _reportRepository.SaveChangesAsync();
     }

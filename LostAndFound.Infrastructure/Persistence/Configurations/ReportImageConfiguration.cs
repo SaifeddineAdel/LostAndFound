@@ -7,8 +7,7 @@ namespace LostAndFound.Infrastructure.Persistence.Configurations;
 public class ReportImageConfiguration
     : IEntityTypeConfiguration<ReportImage>
 {
-    public void Configure(
-        EntityTypeBuilder<ReportImage> builder)
+    public void Configure(EntityTypeBuilder<ReportImage> builder)
     {
         builder.HasKey(x => x.Id);
 

@@ -1,6 +1,5 @@
 ﻿using LostAndFound.Application.Features.Reports.DTOs;
 using LostAndFound.Domain.Entities;
-using LostAndFound.Domain.Enums;
 
 namespace LostAndFound.Application.Features.Reports.Mappers;
 
@@ -10,25 +9,19 @@ public static class ReportMapper
         CreateReportRequest request,
         int userId)
     {
-        return new Report
-        {
-            UserId = userId,
-            Type = request.Type,
-            Status = ReportStatus.Pending,
-            Title = request.Title.Trim(),
-            Description = request.Description.Trim(),
-            PrivateDescription =
-                request.PrivateDescription?.Trim(),
-            CategoryId = request.CategoryId,
-            SubCategoryId = request.SubCategoryId,
-            LocationId = request.LocationId,
-            ItemDate = request.ItemDate,
-            CreatedAt = DateTimeOffset.UtcNow
-        };
+        return Report.Create(
+            userId,
+            request.Type,
+            request.Title,
+            request.Description,
+            request.PrivateDescription,
+            request.CategoryId,
+            request.SubCategoryId,
+            request.LocationId,
+            request.ItemDate);
     }
 
-    public static ReportResponse ToResponse(
-        Report report)
+    public static ReportResponse ToResponse(Report report)
     {
         return new ReportResponse
         {
@@ -48,8 +41,7 @@ public static class ReportMapper
         };
     }
 
-    public static AdminReportResponse ToAdminResponse(
-        Report report)
+    public static AdminReportResponse ToAdminResponse(Report report)
     {
         return new AdminReportResponse
         {
@@ -76,6 +68,18 @@ public static class ReportMapper
         };
     }
 
+    public static IEnumerable<ReportResponse> ToResponse(
+        IEnumerable<Report> reports)
+    {
+        return reports.Select(ToResponse);
+    }
+
+    public static IEnumerable<AdminReportResponse> ToAdminResponse(
+        IEnumerable<Report> reports)
+    {
+        return reports.Select(ToAdminResponse);
+    }
+
     private static string GetImageUrl(string imageUrl)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
@@ -97,42 +101,5 @@ public static class ReportMapper
             imageUrl.Replace('\\', '/'));
 
         return $"/uploads/reports/{fileName}";
-    }
-
-    public static IEnumerable<ReportResponse> ToResponse(
-        IEnumerable<Report> reports)
-    {
-        return reports.Select(ToResponse);
-    }
-
-    public static IEnumerable<AdminReportResponse> ToAdminResponse(
-        IEnumerable<Report> reports)
-    {
-        return reports.Select(ToAdminResponse);
-    }
-
-    public static void Approve(
-        Report report,
-        int approvedByUserId)
-    {
-        report.Status = ReportStatus.Approved;
-        report.ApprovedByUserId = approvedByUserId;
-        report.ApprovedAt = DateTimeOffset.UtcNow;
-    }
-
-    public static void Reject(
-        Report report)
-    {
-        report.Status = ReportStatus.Rejected;
-        report.UpdatedAt = DateTimeOffset.UtcNow;
-    }
-
-    public static void Resolve(
-        Report report,
-        int resolvedByUserId)
-    {
-        report.Status = ReportStatus.Resolved;
-        report.ResolvedAt = DateTimeOffset.UtcNow;
-        report.ResolvedByUserId = resolvedByUserId;
     }
 }
