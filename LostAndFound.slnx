@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LostAndFound.Api/LostAndFound.Api.csproj" />
+  <Project Path="LostAndFound.Application/LostAndFound.Application.csproj" />
+  <Project Path="LostAndFound.Domain/LostAndFound.Domain.csproj" />
+  <Project Path="LostAndFound.Infrastructure/LostAndFound.Infrastructure.csproj" />
+</Solution>
