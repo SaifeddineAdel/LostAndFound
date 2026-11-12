@@ -3,4 +3,5 @@
   <Project Path="LostAndFound.Application/LostAndFound.Application.csproj" />
   <Project Path="LostAndFound.Domain/LostAndFound.Domain.csproj" />
   <Project Path="LostAndFound.Infrastructure/LostAndFound.Infrastructure.csproj" />
+  <Project Path="LostAndFound.Tests/LostAndFound.Tests.csproj" Id="4cd3ca3d-11e8-4513-b75a-eb5ed0821108" />
 </Solution>
