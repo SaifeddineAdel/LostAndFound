@@ -7,6 +7,7 @@ using LostAndFound.Infrastructure.Options;
 using LostAndFound.Infrastructure.Persistence.Data;
 using LostAndFound.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -83,6 +84,17 @@ public class Program
 
         var app = builder.Build();
 
+        if (app.Environment.IsEnvironment("Docker"))
+        {
+            await using var scope =
+                app.Services.CreateAsyncScope();
+
+            var dbContext = scope.ServiceProvider
+                .GetRequiredService<ApplicationDbContext>();
+
+            await dbContext.Database.MigrateAsync();
+        }
+
         await DatabaseSeeder.SeedAdminAsync(
             app.Services,
             app.Configuration);
@@ -92,7 +104,10 @@ public class Program
             app.MapOpenApi();
         }
 
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsEnvironment("Docker"))
+        {
+            app.UseHttpsRedirection();
+        }
 
         app.UseStaticFiles();
 

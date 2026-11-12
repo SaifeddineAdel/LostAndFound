@@ -1,25 +1,47 @@
-﻿
-namespace LostAndFound.Application.Common.Models;
+﻿namespace LostAndFound.Application.Common.Models;
 
 public class PaginatedResponse<T>
 {
-    public List<T> Items { get; set; } = [];
+    public IReadOnlyList<T> Items { get; }
 
-    public int PageNumber { get; set; }
+    public int PageNumber { get; }
 
-    public int PageSize { get; set; }
+    public int PageSize { get; }
 
-    public int TotalCount { get; set; }
+    public int TotalCount { get; }
 
-    public int TotalPages =>
-        PageSize <= 0
-            ? 0
-            : (int)Math.Ceiling(
-                TotalCount / (double)PageSize);
+    public int TotalPages { get; }
 
-    public bool HasPreviousPage =>
-        PageNumber > 1;
+    public bool HasPreviousPage { get; }
 
-    public bool HasNextPage =>
-        PageNumber < TotalPages;
+    public bool HasNextPage { get; }
+
+    public PaginatedResponse(
+        IReadOnlyList<T> items,
+        int pageNumber,
+        int pageSize,
+        int totalCount)
+    {
+        Items = items;
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+        TotalCount = totalCount;
+
+        if (pageSize <= 0 || totalCount <= 0)
+        {
+            TotalPages = 0;
+        }
+        else
+        {
+            TotalPages = totalCount / pageSize;
+
+            if (totalCount % pageSize != 0)
+            {
+                TotalPages++;
+            }
+        }
+
+        HasPreviousPage = pageNumber > 1;
+        HasNextPage = pageNumber < TotalPages;
+    }
 }
