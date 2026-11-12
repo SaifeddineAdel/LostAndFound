@@ -54,6 +54,9 @@ public static class DependencyInjection
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IReportRepository, ReportRepository>();
 
+        services.AddSingleton<SimilarityCalculator>();
+        services.AddScoped<IReportMatchingService, ReportMatchingService>();
+
         services.AddScoped<INotificationRepository, NotificationRepository>();
 
         services.Configure<RabbitMqOptions>(

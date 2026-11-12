@@ -157,4 +157,22 @@ public class ReportRepository : IReportRepository
             TotalCount = totalCount
         };
     }
+
+    public async Task<IReadOnlyList<Report>> GetApprovedOppositeReportsAsync(
+        int reportId,
+        ReportType oppositeType,
+        int categoryId,
+        int subCategoryId)
+    {
+        return await _context.Reports
+            .AsNoTracking()
+            .Where(r =>
+                r.Id != reportId &&
+                r.Status == ReportStatus.Approved &&
+                r.Type == oppositeType &&
+                r.CategoryId == categoryId &&
+                r.SubCategoryId == subCategoryId)
+            .Include(r => r.Images)
+            .ToListAsync();
+    }
 }

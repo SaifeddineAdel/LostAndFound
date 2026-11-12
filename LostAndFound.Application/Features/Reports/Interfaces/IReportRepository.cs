@@ -1,6 +1,7 @@
 ﻿using LostAndFound.Application.Common.Models;
 using LostAndFound.Application.Features.Reports.DTOs;
 using LostAndFound.Domain.Entities;
+using LostAndFound.Domain.Enums;
 
 namespace LostAndFound.Application.Features.Reports.Interfaces;
 
@@ -22,6 +23,12 @@ public interface IReportRepository
 
     Task<PaginatedResponse<Report>> GetAllPendingAsync(
         PaginationRequest request);
+
+    Task<IReadOnlyList<Report>> GetApprovedOppositeReportsAsync(
+        int reportId,
+        ReportType oppositeType,
+        int categoryId,
+        int subCategoryId);
 
     Task AddAsync(Report report);
 

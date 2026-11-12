@@ -13,10 +13,14 @@ namespace LostAndFound.Api.Controllers;
 public class ReportsController : ControllerBase
 {
     private readonly IReportService _reportService;
+    private readonly IReportMatchingService _reportMatchingService;
 
-    public ReportsController(IReportService reportService)
+    public ReportsController(
+        IReportService reportService,
+        IReportMatchingService reportMatchingService)
     {
         _reportService = reportService;
+        _reportMatchingService = reportMatchingService;
     }
 
     [HttpGet]
@@ -34,6 +38,15 @@ public class ReportsController : ControllerBase
         var report = await _reportService.GetByIdAsync(id);
 
         return Ok(report);
+    }
+
+    [HttpGet("{id:int}/similar")]
+    public async Task<ActionResult<IReadOnlyList<ReportResponse>>> GetSimilarReports(
+        int id)
+    {
+        var reports = await _reportMatchingService.GetSimilarReportsAsync(id);
+
+        return Ok(reports);
     }
 
     [HttpGet("my-reports")]
