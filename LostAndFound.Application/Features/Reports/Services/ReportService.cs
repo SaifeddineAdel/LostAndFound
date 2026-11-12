@@ -99,6 +99,7 @@ public class ReportService : IReportService
                 }
                 catch
                 {
+                    // Ignore cleanup errors to preserve the original exception.
                 }
             }
 
@@ -136,13 +137,15 @@ public class ReportService : IReportService
         var result =
             await _reportRepository.GetAllApprovedAsync(request);
 
-        return new PaginatedResponse<ReportResponse>
-        {
-            Items = ReportMapper.ToResponse(result.Items).ToList(),
-            PageNumber = result.PageNumber,
-            PageSize = result.PageSize,
-            TotalCount = result.TotalCount
-        };
+        var items = ReportMapper
+            .ToResponse(result.Items)
+            .ToList();
+
+        return new PaginatedResponse<ReportResponse>(
+            items,
+            result.PageNumber,
+            result.PageSize,
+            result.TotalCount);
     }
 
     public async Task<PaginatedResponse<ReportResponse>> SearchApprovedAsync(
@@ -151,13 +154,15 @@ public class ReportService : IReportService
         var result =
             await _reportRepository.SearchApprovedAsync(request);
 
-        return new PaginatedResponse<ReportResponse>
-        {
-            Items = ReportMapper.ToResponse(result.Items).ToList(),
-            PageNumber = result.PageNumber,
-            PageSize = result.PageSize,
-            TotalCount = result.TotalCount
-        };
+        var items = ReportMapper
+            .ToResponse(result.Items)
+            .ToList();
+
+        return new PaginatedResponse<ReportResponse>(
+            items,
+            result.PageNumber,
+            result.PageSize,
+            result.TotalCount);
     }
 
     public async Task<PaginatedResponse<AdminReportResponse>> GetAllPendingAsync(
@@ -166,13 +171,15 @@ public class ReportService : IReportService
         var result =
             await _reportRepository.GetAllPendingAsync(request);
 
-        return new PaginatedResponse<AdminReportResponse>
-        {
-            Items = ReportMapper.ToAdminResponse(result.Items).ToList(),
-            PageNumber = result.PageNumber,
-            PageSize = result.PageSize,
-            TotalCount = result.TotalCount
-        };
+        var items = ReportMapper
+            .ToAdminResponse(result.Items)
+            .ToList();
+
+        return new PaginatedResponse<AdminReportResponse>(
+            items,
+            result.PageNumber,
+            result.PageSize,
+            result.TotalCount);
     }
 
     public async Task<AdminReportResponse> GetByIdAdminAsync(int id)
@@ -190,13 +197,15 @@ public class ReportService : IReportService
         var result =
             await _reportRepository.GetMyReportsAsync(userId, request);
 
-        return new PaginatedResponse<ReportResponse>
-        {
-            Items = ReportMapper.ToResponse(result.Items).ToList(),
-            PageNumber = result.PageNumber,
-            PageSize = result.PageSize,
-            TotalCount = result.TotalCount
-        };
+        var items = ReportMapper
+            .ToResponse(result.Items)
+            .ToList();
+
+        return new PaginatedResponse<ReportResponse>(
+            items,
+            result.PageNumber,
+            result.PageSize,
+            result.TotalCount);
     }
 
     public async Task ApproveAsync(int id)

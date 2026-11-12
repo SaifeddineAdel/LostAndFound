@@ -138,24 +138,24 @@ public class ReportRepository : IReportRepository
         IQueryable<Report> query,
         PaginationRequest request)
     {
-        var pageNumber = Math.Max(1, request.PageNumber);
-        var pageSize = Math.Clamp(request.PageSize, 1, 50);
+        var pageNumber = request.PageNumber;
+        var pageSize = request.PageSize;
 
         var totalCount = await query.CountAsync();
 
+        var skip = (pageNumber - 1) * pageSize;
+
         var items = await query
-            .Skip((pageNumber - 1) * pageSize)
+            .Skip(skip)
             .Take(pageSize)
             .Include(x => x.Images)
             .ToListAsync();
 
-        return new PaginatedResponse<Report>
-        {
-            Items = items,
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            TotalCount = totalCount
-        };
+        return new PaginatedResponse<Report>(
+            items,
+            pageNumber,
+            pageSize,
+            totalCount);
     }
 
     public async Task<IReadOnlyList<Report>> GetApprovedOppositeReportsAsync(
